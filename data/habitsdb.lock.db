@@ -1,0 +1,6 @@
+#FileLock
+#Thu Oct 02 18:11:40 UTC 2025
+hostName=DSPN180100120.sp01.local
+id=199a61f69823fbd762c173a3d5e376aff0be7f57241
+method=file
+server=192.168.1.4\:63262

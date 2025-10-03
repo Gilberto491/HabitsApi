@@ -29,6 +29,9 @@ public class CheckInEntity {
     @Column(nullable = false)
     private String id;
 
+    @Column(name = "user_id", nullable = false)
+    private String userId;
+
     @Column(name = "habit_id", nullable = false)
     private String habitId;
 

@@ -24,5 +24,10 @@ public class Habit {
     private Boolean active;
     private String createdAt;
     private Category category;
+    private int pointsPerCompletion;
+    private int basePoints = 10;
+
+    public int basePoints() { return basePoints; }
+    public Habit withBasePoints(int basePoints){ this.basePoints = basePoints; return this; }
 
 }

@@ -21,6 +21,7 @@ import com.app.habits.infrastructure.rest.dto.weekly.WeeklyOverviewDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -91,10 +92,10 @@ public class HabitController {
 
     @PostMapping("/{habitId}/checkins")
     @ResponseStatus(HttpStatus.CREATED)
-    public CheckInResponseDto doCheckIn(@PathVariable String habitId,
+    public ResponseEntity<CheckInResponseDto> doCheckIn(@PathVariable String habitId,
                                         @AuthenticationPrincipal AuthenticatedUser user) {
-        var c = doCheckInUseCase.execute(user.id(), habitId);
-        return new CheckInResponseDto(c.getHabitId(), c.getCheckedOn(), c.getCheckedAt());
+        var result = doCheckInUseCase.execute(user.id(), habitId);
+        return ResponseEntity.ok(CheckInResponseDto.from(result));
     }
 
     @DeleteMapping("/{habitId}/checkins/today")

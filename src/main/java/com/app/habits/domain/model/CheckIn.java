@@ -17,6 +17,7 @@ import java.time.OffsetDateTime;
 public class CheckIn {
 
     private String id;
+    private String userId;
     private String habitId;
     private LocalDate checkedOn;
     private OffsetDateTime checkedAt;

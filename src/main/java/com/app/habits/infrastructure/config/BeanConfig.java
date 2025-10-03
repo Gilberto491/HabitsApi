@@ -2,16 +2,20 @@ package com.app.habits.infrastructure.config;
 
 import com.app.habits.application.usecase.DoCheckInUseCase;
 import com.app.habits.application.usecase.GetCurrentWeekOverviewUseCase;
+import com.app.habits.application.usecase.LevelingService;
 import com.app.habits.application.usecase.ListCategoriesUseCase;
 import com.app.habits.application.usecase.ListTemplatesByCategoryUseCase;
 import com.app.habits.application.usecase.ListTodayWithStatusUseCase;
 import com.app.habits.application.usecase.UndoTodayCheckInUseCase;
 import com.app.habits.domain.port.CategoryRepositoryPort;
 import com.app.habits.domain.port.CheckInRepositoryPort;
+import com.app.habits.domain.port.GamificationProgressPort;
 import com.app.habits.domain.port.HabitRepositoryPort;
 import com.app.habits.domain.port.HabitTemplateRepositoryPort;
 import com.app.habits.infrastructure.persistence.adapter.CheckInRepositoryAdapter;
+import com.app.habits.infrastructure.persistence.adapter.GamificationProgressRepositoryAdapter;
 import com.app.habits.infrastructure.persistence.spring.CheckInJpaRepository;
+import com.app.habits.infrastructure.persistence.spring.ProgressJpaRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,8 +40,12 @@ public class BeanConfig {
     }
 
     @Bean
-    public DoCheckInUseCase doCheckInUseCase(CheckInRepositoryPort c, HabitRepositoryPort h, Clock clock) {
-        return new DoCheckInUseCase(c, h, clock);
+    public DoCheckInUseCase doCheckInUseCase(CheckInRepositoryPort c,
+                                             HabitRepositoryPort h,
+                                             GamificationProgressPort progressPort,
+                                             LevelingService leveling,
+                                             Clock clock) {
+        return new DoCheckInUseCase(c, h, progressPort, leveling, clock);
     }
 
     @Bean
@@ -63,6 +71,16 @@ public class BeanConfig {
             Clock clock
     ) {
         return new GetCurrentWeekOverviewUseCase(habitRepo, checkInRepo, clock, categoryRepo);
+    }
+
+    @Bean
+    public GamificationProgressPort gamificationProgressPort(ProgressJpaRepository jpa) {
+        return new GamificationProgressRepositoryAdapter(jpa);
+    }
+
+    @Bean
+    public LevelingService levelingService() {
+        return new LevelingService();
     }
 
 }

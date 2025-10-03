@@ -49,6 +49,9 @@ public class HabitEntity {
     @Column(nullable = false)
     private Boolean active = true;
 
+    @Column(name = "base_points", nullable = false)
+    private int basePoints = 10;
+
     @Column(name = "created_at", nullable = false)
     @Generated(event = EventType.INSERT)
     private OffsetDateTime createdAt = OffsetDateTime.now();

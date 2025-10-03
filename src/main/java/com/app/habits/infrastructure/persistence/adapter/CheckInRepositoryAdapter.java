@@ -6,8 +6,12 @@ import com.app.habits.domain.port.CheckInRepositoryPort;
 import com.app.habits.infrastructure.persistence.mapper.CheckInEntityMapper;
 import com.app.habits.infrastructure.persistence.spring.CheckInJpaRepository;
 
+import java.sql.Date;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class CheckInRepositoryAdapter implements CheckInRepositoryPort {
 
@@ -64,5 +68,25 @@ public class CheckInRepositoryAdapter implements CheckInRepositoryPort {
         return repo.countPerCategory(userId, start, end).stream()
                 .map(r -> (IdCount) new IdCountImpl(r.getId(), r.getCount()))
                 .toList();
+    }
+
+    @Override
+    public List<LocalDate> listCheckedDaysByHabit(String habitId) {
+        return repo.listCheckedDaysByHabit((habitId));
+    }
+
+    @Override
+    public Map<LocalDate, Long> countDistinctHabitsPerDay(String userId, LocalDate start, LocalDate end) {
+        var rows = repo.countDistinctHabitsPerDay(userId, start, end);
+        Map<LocalDate, Long> m = new LinkedHashMap<>();
+        for (Object[] r : rows) {
+            m.put(((Date) r[0]).toLocalDate(), ((Number) r[1]).longValue());
+        }
+        return m;
+    }
+
+    @Override
+    public Optional<LocalDate> findFirstCheckInDateByUser(String userId) {
+        return Optional.ofNullable(repo.findFirstCheckInDateByUser(userId));
     }
 }

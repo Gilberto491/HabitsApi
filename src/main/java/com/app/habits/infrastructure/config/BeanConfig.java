@@ -2,6 +2,8 @@ package com.app.habits.infrastructure.config;
 
 import com.app.habits.application.usecase.DoCheckInUseCase;
 import com.app.habits.application.usecase.GetCurrentWeekOverviewUseCase;
+import com.app.habits.application.usecase.GetHabitStreakUseCase;
+import com.app.habits.application.usecase.GetOverallStreakUseCase;
 import com.app.habits.application.usecase.LevelingService;
 import com.app.habits.application.usecase.ListCategoriesUseCase;
 import com.app.habits.application.usecase.ListTemplatesByCategoryUseCase;
@@ -83,4 +85,13 @@ public class BeanConfig {
         return new LevelingService();
     }
 
+    @Bean
+    public GetHabitStreakUseCase getHabitStreakUseCase(CheckInRepositoryPort c, Clock clock) {
+        return new GetHabitStreakUseCase(c, clock);
+    }
+
+    @Bean
+    public GetOverallStreakUseCase getOverallStreakUseCase(CheckInRepositoryPort c, Clock clock) {
+        return new GetOverallStreakUseCase(c, clock);
+    }
 }

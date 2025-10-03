@@ -78,6 +78,34 @@ public interface CheckInJpaRepository extends JpaRepository<CheckInEntity, Strin
                                  @Param("start") LocalDate start,
                                  @Param("end") LocalDate end);
 
+    @Query("""
+                select distinct c.checkedOn
+                from CheckInEntity c
+                where c.habitId = :habitId
+                order by c.checkedOn
+            """)
+    List<LocalDate> listCheckedDaysByHabit(@Param("habitId") String habitId);
+
+    @Query("""
+                select min(c.checkedOn)
+                from CheckInEntity c
+                where c.userId = :userId
+            """)
+    LocalDate findFirstCheckInDateByUser(@Param("userId") String userId);
+
+    @Query(value = """
+                select checked_on as day, count(distinct habit_id) as cnt
+                from checkins
+                where user_id = :userId
+                  and checked_on between :start and :end
+                group by checked_on
+                order by checked_on
+            """, nativeQuery = true)
+    List<Object[]> countDistinctHabitsPerDay(
+            @Param("userId") String userId,
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end);
+
     interface DayRow {
         LocalDate getDay();
 

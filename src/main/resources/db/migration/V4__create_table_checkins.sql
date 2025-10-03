@@ -10,3 +10,5 @@ CREATE TABLE checkins (
 CREATE INDEX IF NOT EXISTS idx_checkins_user_date ON checkins(user_id, checked_on);
 CREATE INDEX IF NOT EXISTS idx_checkins_habit_date ON checkins(habit_id, checked_on);
 CREATE INDEX IF NOT EXISTS idx_habits_category ON habits(category_id);
+create index if not exists idx_checkins_habit_day on checkins(habit_id, checked_on);
+create index if not exists idx_checkins_user_day  on checkins(user_id, checked_on);

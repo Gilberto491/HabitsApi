@@ -15,12 +15,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     // === Exceções de domínio (ApiException) ===
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> handleApiException(ApiException ex, HttpServletRequest req) {
@@ -33,6 +35,23 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(ex.getStatus()).body(body);
     }
+
+    // === Resource inválido ===
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(NoResourceFoundException ex, HttpServletRequest req) {
+        ErrorResponse body = ErrorResponseFactory.build(
+                req,
+                ErrorCode.NOT_FOUND,
+                ex.getMessage(),
+                null,
+                null
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(body);
+    }
+
 
     // === Validação (Bean Validation @Valid) ===
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -50,7 +69,7 @@ public class GlobalExceptionHandler {
                 null,
                 fields
         );
-        return ResponseEntity.unprocessableEntity().body(body); // 422
+        return ResponseEntity.unprocessableEntity().body(body);
     }
 
     private ErrorResponse.FieldErrorItem toFieldItem(FieldError e) {

@@ -5,6 +5,7 @@ import com.app.habits.application.usecase.CreateHabitUseCase;
 import com.app.habits.application.usecase.DeleteHabitUseCase;
 import com.app.habits.application.usecase.DoCheckInUseCase;
 import com.app.habits.application.usecase.GetCurrentWeekOverviewUseCase;
+import com.app.habits.application.usecase.GetHabitStreakUseCase;
 import com.app.habits.application.usecase.ListTodayWithStatusUseCase;
 import com.app.habits.application.usecase.ToggleHabitActiveUseCase;
 import com.app.habits.application.usecase.UndoTodayCheckInUseCase;
@@ -14,6 +15,7 @@ import com.app.habits.infrastructure.persistence.mapper.HabitMapper;
 import com.app.habits.infrastructure.rest.dto.CheckInResponseDto;
 import com.app.habits.infrastructure.rest.dto.HabitCreateDto;
 import com.app.habits.infrastructure.rest.dto.HabitResponseDto;
+import com.app.habits.infrastructure.rest.dto.HabitStreakDto;
 import com.app.habits.infrastructure.rest.dto.HabitToggleDto;
 import com.app.habits.infrastructure.rest.dto.HabitUpdateDto;
 import com.app.habits.infrastructure.rest.dto.TodayHabitDto;
@@ -52,6 +54,7 @@ public class HabitController {
     private final ListTodayWithStatusUseCase listTodayWithStatusUseCase;
     private final UndoTodayCheckInUseCase undoTodayCheckInUseCase;
     private final GetCurrentWeekOverviewUseCase getCurrentWeekOverviewUseCase;
+    private final GetHabitStreakUseCase getHabitStreakUseCase;
 
     private String currentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -115,5 +118,11 @@ public class HabitController {
     @GetMapping("/overview/week")
     public WeeklyOverviewDto getWeeklyOverview(@AuthenticationPrincipal AuthenticatedUser user) {
         return getCurrentWeekOverviewUseCase.execute(user);
+    }
+
+    @GetMapping("/{id}/streak")
+    public ResponseEntity<HabitStreakDto> getHabitStreak(@PathVariable String id) {
+        var r = getHabitStreakUseCase.execute(id);
+        return ResponseEntity.ok(new HabitStreakDto(id, r.currentStreak(), r.maxStreak()));
     }
 }

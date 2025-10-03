@@ -7,6 +7,7 @@ import com.app.habits.infrastructure.persistence.spring.CategoryJpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class CategoryRepositoryAdapter implements CategoryRepositoryPort {
@@ -27,5 +28,16 @@ public class CategoryRepositoryAdapter implements CategoryRepositoryPort {
     public Category findById(String id) {
         CategoryEntity e = jpa.findById(id).orElseThrow();
         return new Category(e.getId(), e.getName(), e.getColorHex());
+    }
+
+    @Override
+    public List<Category> findByIds(Set<String> ids) {
+        return jpa.findByIdIn(ids).stream()
+                .map(entity -> new Category(
+                        entity.getId(),
+                        entity.getName(),
+                        entity.getColorHex()
+                ))
+                .toList();
     }
 }

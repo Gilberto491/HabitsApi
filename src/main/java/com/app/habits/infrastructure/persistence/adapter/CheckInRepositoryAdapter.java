@@ -17,6 +17,9 @@ public class CheckInRepositoryAdapter implements CheckInRepositoryPort {
         this.repo = repo;
     }
 
+    private record DayCountImpl(LocalDate day, long count) implements DayCount {}
+    private record IdCountImpl(String id, long count) implements IdCount {}
+
     @Override
     public boolean existsByHabitAndDay(String habitId, LocalDate day) {
         return repo.existsByHabitIdAndCheckedOn(habitId, day);
@@ -39,6 +42,27 @@ public class CheckInRepositoryAdapter implements CheckInRepositoryPort {
                 .stream()
                 .map(r -> CheckInEntityMapper.toTodayStatus(r.getHabitId(), r.getName(),
                         Boolean.TRUE.equals(r.getDone()), r.getCheckedAt()))
+                .toList();
+    }
+
+    @Override
+    public List<DayCount> countByUserGroupedPerDay(String userId, LocalDate start, LocalDate end) {
+        return repo.countPerDay(userId, start, end).stream()
+                .map(r -> (DayCount) new DayCountImpl(r.getDay(), r.getCount()))
+                .toList();
+    }
+
+    @Override
+    public List<IdCount> countByUserGroupedPerHabit(String userId, LocalDate start, LocalDate end) {
+        return repo.countPerHabit(userId, start, end).stream()
+                .map(r -> (IdCount) new IdCountImpl(r.getId(), r.getCount()))
+                .toList();
+    }
+
+    @Override
+    public List<IdCount> countByUserGroupedPerCategory(String userId, LocalDate start, LocalDate end) {
+        return repo.countPerCategory(userId, start, end).stream()
+                .map(r -> (IdCount) new IdCountImpl(r.getId(), r.getCount()))
                 .toList();
     }
 }

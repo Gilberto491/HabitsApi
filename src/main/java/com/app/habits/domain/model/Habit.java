@@ -23,5 +23,6 @@ public class Habit {
     private Integer pointsPerCheckIn;
     private Boolean active;
     private String createdAt;
+    private Category category;
 
 }

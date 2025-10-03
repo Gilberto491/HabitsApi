@@ -1,6 +1,7 @@
 package com.app.habits.infrastructure.config;
 
 import com.app.habits.application.usecase.DoCheckInUseCase;
+import com.app.habits.application.usecase.GetCurrentWeekOverviewUseCase;
 import com.app.habits.application.usecase.ListCategoriesUseCase;
 import com.app.habits.application.usecase.ListTemplatesByCategoryUseCase;
 import com.app.habits.application.usecase.ListTodayWithStatusUseCase;
@@ -52,6 +53,16 @@ public class BeanConfig {
     @Bean
     public Clock clock() {
         return Clock.systemDefaultZone();
+    }
+
+    @Bean
+    public GetCurrentWeekOverviewUseCase getCurrentWeekOverviewUseCase(
+            HabitRepositoryPort habitRepo,
+            CheckInRepositoryPort checkInRepo,
+            CategoryRepositoryPort categoryRepo,
+            Clock clock
+    ) {
+        return new GetCurrentWeekOverviewUseCase(habitRepo, checkInRepo, clock, categoryRepo);
     }
 
 }

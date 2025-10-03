@@ -20,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @AllArgsConstructor
-@Table(name = "check_ins", uniqueConstraints = {
+@Table(name = "checkins", uniqueConstraints = {
         @UniqueConstraint(name = "uk_checkin_habit_day", columnNames = {"habit_id", "checked_on"})
 })
 public class CheckInEntity {

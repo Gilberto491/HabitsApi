@@ -3,6 +3,7 @@ package com.app.habits.infrastructure.persistence.spring;
 import com.app.habits.infrastructure.persistence.entity.CheckInEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -39,4 +40,53 @@ public interface CheckInJpaRepository extends JpaRepository<CheckInEntity, Strin
                  order by h.name
             """)
     List<TodayRow> listTodayStatus(String userId, LocalDate today);
+
+    @Query(value = """
+              SELECT ci.checked_on AS day,
+                     COUNT(*)::bigint AS count
+                FROM checkins ci
+               WHERE ci.user_id = :userId
+                 AND ci.checked_on BETWEEN :start AND :end
+            GROUP BY ci.checked_on
+            """, nativeQuery = true)
+    List<DayRow> countPerDay(@Param("userId") String userId,
+                             @Param("start") LocalDate start,
+                             @Param("end") LocalDate end);
+
+    @Query(value = """
+              SELECT ci.habit_id AS id,
+                     COUNT(*)::bigint AS count
+                FROM checkins ci
+               WHERE ci.user_id = :userId
+                 AND ci.checked_on BETWEEN :start AND :end
+            GROUP BY ci.habit_id
+            """, nativeQuery = true)
+    List<IdRow> countPerHabit(@Param("userId") String userId,
+                              @Param("start") LocalDate start,
+                              @Param("end") LocalDate end);
+
+    @Query(value = """
+              SELECT h.category_id AS id,
+                     COUNT(*)::bigint AS count
+                FROM checkins ci
+                JOIN habits h ON h.id = ci.habit_id
+               WHERE ci.user_id = :userId
+                 AND ci.checked_on BETWEEN :start AND :end
+            GROUP BY h.category_id
+            """, nativeQuery = true)
+    List<IdRow> countPerCategory(@Param("userId") String userId,
+                                 @Param("start") LocalDate start,
+                                 @Param("end") LocalDate end);
+
+    interface DayRow {
+        LocalDate getDay();
+
+        long getCount();
+    }
+
+    interface IdRow {
+        String getId();
+
+        long getCount();
+    }
 }

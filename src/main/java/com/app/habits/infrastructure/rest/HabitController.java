@@ -4,6 +4,7 @@ import com.app.habits.application.usecase.CreateHabitFromTemplateUseCase;
 import com.app.habits.application.usecase.CreateHabitUseCase;
 import com.app.habits.application.usecase.DeleteHabitUseCase;
 import com.app.habits.application.usecase.DoCheckInUseCase;
+import com.app.habits.application.usecase.GetCurrentWeekOverviewUseCase;
 import com.app.habits.application.usecase.ListTodayWithStatusUseCase;
 import com.app.habits.application.usecase.ToggleHabitActiveUseCase;
 import com.app.habits.application.usecase.UndoTodayCheckInUseCase;
@@ -16,6 +17,7 @@ import com.app.habits.infrastructure.rest.dto.HabitResponseDto;
 import com.app.habits.infrastructure.rest.dto.HabitToggleDto;
 import com.app.habits.infrastructure.rest.dto.HabitUpdateDto;
 import com.app.habits.infrastructure.rest.dto.TodayHabitDto;
+import com.app.habits.infrastructure.rest.dto.weekly.WeeklyOverviewDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -48,6 +50,7 @@ public class HabitController {
     private final DoCheckInUseCase doCheckInUseCase;
     private final ListTodayWithStatusUseCase listTodayWithStatusUseCase;
     private final UndoTodayCheckInUseCase undoTodayCheckInUseCase;
+    private final GetCurrentWeekOverviewUseCase getCurrentWeekOverviewUseCase;
 
     private String currentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -106,5 +109,10 @@ public class HabitController {
         return listTodayWithStatusUseCase.execute(user.id()).stream()
                 .map(t -> new TodayHabitDto(t.habitId(), t.name(), t.done(), t.checkedAt()))
                 .toList();
+    }
+
+    @GetMapping("/overview/week")
+    public WeeklyOverviewDto getWeeklyOverview(@AuthenticationPrincipal AuthenticatedUser user) {
+        return getCurrentWeekOverviewUseCase.execute(user);
     }
 }

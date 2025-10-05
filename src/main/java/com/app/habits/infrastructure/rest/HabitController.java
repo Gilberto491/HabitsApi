@@ -56,41 +56,34 @@ public class HabitController {
     private final GetCurrentWeekOverviewUseCase getCurrentWeekOverviewUseCase;
     private final GetHabitStreakUseCase getHabitStreakUseCase;
 
-    private String currentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getPrincipal() instanceof AuthenticatedUser user) {
-            return user.id();
-        }
-        throw new IllegalStateException("Usuário não autenticado");
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public HabitResponseDto create(@RequestBody @Valid HabitCreateDto req) {
+    public HabitResponseDto create(@RequestBody @Valid HabitCreateDto req, @AuthenticationPrincipal AuthenticatedUser user) {
         if (req.templateId() != null && !req.templateId().isBlank()) {
-            var res = createFromTplUC.execute(req.templateId(), HabitMapper.toDomain(req), currentUserId());
+            var res = createFromTplUC.execute(req.templateId(), HabitMapper.toDomain(req), user.id());
             return HabitMapper.toResponse(res);
         }
-        var res = createUC.execute(HabitMapper.toDomain(req), currentUserId());
+        var res = createUC.execute(HabitMapper.toDomain(req), user.id());
         return HabitMapper.toResponse(res);
     }
 
     @PutMapping("/{id}")
-    public HabitResponseDto update(@PathVariable String id, @RequestBody @Valid HabitUpdateDto req) {
-        var res = updateUC.execute(id, HabitMapper.toDomain(req), currentUserId());
+    public HabitResponseDto update(@PathVariable String id, @RequestBody @Valid HabitUpdateDto req,
+                                   @AuthenticationPrincipal AuthenticatedUser user) {
+        var res = updateUC.execute(id, HabitMapper.toDomain(req), user.id());
         return HabitMapper.toResponse(res);
     }
 
     @PatchMapping("/{id}/active")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void toggle(@PathVariable String id, @RequestBody @Valid HabitToggleDto req) {
-        toggleUC.execute(id, req.active(), currentUserId());
+    public void toggle(@PathVariable String id, @RequestBody @Valid HabitToggleDto req, @AuthenticationPrincipal AuthenticatedUser user) {
+        toggleUC.execute(id, req.active(), user.id());
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable String id) {
-        deleteUC.execute(id, currentUserId());
+    public void delete(@PathVariable String id, @AuthenticationPrincipal AuthenticatedUser user) {
+        deleteUC.execute(id, user.id());
     }
 
     @PostMapping("/{habitId}/checkins")
@@ -121,7 +114,7 @@ public class HabitController {
     }
 
     @GetMapping("/{id}/streak")
-    public ResponseEntity<HabitStreakDto> getHabitStreak(@PathVariable String id) {
+    public ResponseEntity<HabitStreakDto> getHabitStreak(@PathVariable String id, @AuthenticationPrincipal AuthenticatedUser user) {
         var r = getHabitStreakUseCase.execute(id);
         return ResponseEntity.ok(new HabitStreakDto(id, r.currentStreak(), r.maxStreak()));
     }
